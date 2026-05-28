@@ -35,7 +35,7 @@ loop do
 
   case choice
   when "1"
-    puts "\n--- СТАН ЗАПЧАСТИН ДЛЯ #{car_mark.upcase} #{car_model.upcase} ---"
+    puts "\n СТАН ЗАПЧАСТИН ДЛЯ #{car_mark.upcase} #{car_model.upcase} ---"
     
    
     oil_passed = car_kilometers - oil_last_changes
@@ -50,17 +50,17 @@ loop do
 
     air_in_passed = car_kilometers - last_inside_filter_changes
     air_in_left = air_inside_filter_life - air_in_passed
-    puts "• Салонний фільтр: пройдено #{air_in_passed} км | Залишилось: #{air_in_left} км."
+    puts " Салонний фільтр: пройдено #{air_in_passed} км | Залишилось: #{air_in_left} км."
     puts "  Потрібна заміна фільтра салону" if air_in_left <= 0
 
     brake_passed = car_kilometers - last_brake_changes
     brake_left = brake_life - brake_passed
-    puts "• Гальмівні колодки/бліни: пройдено #{brake_passed} км | Залишилось: #{brake_left} км."
-    puts "  ⚠️ УВАГА! Перевірте гальмівну систему!" if brake_left <= 0
+    puts " Гальмівні колодки/бліни: пройдено #{brake_passed} км | Залишилось: #{brake_left} км."
+    puts "  Перевірте стан колодок" if brake_left <= 0
 
     cooling_passed = car_kilometers - cooling_last_changes
     cooling_left = cooling_liquid_life - cooling_passed
-    puts "• Антифриз (охолодження): пройдено #{cooling_passed} км | Залишилось: #{cooling_left} км."
+    puts " Антифриз (охолодження): пройдено #{cooling_passed} км | Залишилось: #{cooling_left} км."
     puts "  Потрібна заміна охолоджувальної рідини" if cooling_left <= 0
 
   when "2"
