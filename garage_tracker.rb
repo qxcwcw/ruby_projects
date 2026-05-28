@@ -56,7 +56,7 @@ loop do
     brake_passed = car_kilometers - last_brake_changes
     brake_left = brake_life - brake_passed
     puts "• Гальмівні колодки/бліни: пройдено #{brake_passed} км | Залишилось: #{brake_left} км."
-    puts "  ⚠️ УВАГА! Перевірте гальмівну систему!" if brake_left <= 0
+    puts "  Перевірте стан колодок " if brake_left <= 0
 
     cooling_passed = car_kilometers - cooling_last_changes
     cooling_left = cooling_liquid_life - cooling_passed
