@@ -1,14 +1,11 @@
-def filtred_info_by_wors(info, keyword)
+def filter_info_by_words(info, keyword)
+  
+  searched_word = keyword.downcase
 
-selected_info = info.select do |itemm| 
+  info.select do |item| 
+    title = item['title'].downcase
+    summary = item['summary'].downcase
 
-    title = itemm["title"].downcase
-    summary = itemm["summary"].downcase
-    searched_word = keyword.downcase
-
-title.include?(searched_word) || summary.include?(searched_word)
-end
-
-return selected_info
-
+    title.include?(searched_word) || summary.include?(searched_word)
+  end
 end
