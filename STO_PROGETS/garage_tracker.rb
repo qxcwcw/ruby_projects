@@ -1,117 +1,123 @@
-require_relative 'car'
 require_relative 'database'
-# Примусово змушуємо консоль приймати та виводити текст в UTF-8
-Encoding.default_external = Encoding::UTF_8
-loop do 
-  puts "1 Додати нову машину"
-  puts "2 Знайти машину по номеру і перевірити знос запчатин"
-  puts "3 Обновити дані про стан запчастин "
-  puts "4 Вийти"
-  print "Виберіть дію: "
+require_relative 'car' 
 
+Encoding.default_external = Encoding::UTF_8
+
+loop do
+  puts '1 Додати нову машину'
+  puts '2 Знайти машину по номеру і перевірити знос запчастин'
+  puts '3 Оновити дані про стан запчастин'
+  puts '4 Вийти'
+  print 'Виберіть дію: '
+  
   choice = gets.strip
 
   case choice
 
   when "1"
-    puts "\n РЕЄСТРАЦІЯ НОВОГО КЛІЄНТА "
-
-    print "Введіть номер машини"
+    print 'Введіть номер машини: '
     number = gets.strip
-    if Database.find_cars_users(number)
-      puts "Машина з таким номером уже є у базі СТО "
+    
+    if Database.find_car(number)
+      puts 'Машина з таким номером вже є в базі'
       next
     end
-    print "Введіть марку машини"
+
+    print 'Введіть марку: '
     mark = gets.strip
-    print "Ведіть модель машини"
+    print 'Введіть модель: '
     model = gets.strip
-    print "Введіть поточний пробіг машини (км): "
+    print 'Поточний пробіг (км): '
     kilometers = gets.to_i
-
-    puts "\n[ Введіть пробіг, на якому мінявся розхідник востаннє ]"
     
-    print " Заміна мастила двигуна (км): "
-    oil_last_changes = gets.to_i
+    puts "\n Введіть пробіг, на якому мінявся розхідник востаннє "
+    print 'Заміна мастила (км): '
+    oil = gets.to_i
+    print 'Заміна повітряного фільтра (км): '
+    out_filter = gets.to_i
+    print 'Заміна фільтра салону (км): '
+    in_filter = gets.to_i
+    print 'Заміна гальмівних колодок (км): '
+    brakes = gets.to_i
+    print 'Заміна антифризу (км): '
+    cooling = gets.to_i
 
-    print " Заміна повітряного фільтра двигуна (км): "
-    last_outside_filter_changes = gets.to_i
-
-    print " Заміна салонного фільтра (км): "
-    last_inside_filter_changes = gets.to_i
-
-    print " Заміна гальмівних колодок/блінів (км): "
-    last_brake_changes = gets.to_i
-
-    print " Заміна антифризу (км): "
-    cooling_last_changes = gets.to_i
-
-
-    Database.add_cars_users(
-      number, mark, model, kilometers, 
-        oil_last_changes, last_outside_filter_changes, 
-        last_inside_filter_changes, last_brake_changes, cooling_last_changes
-    )
-
-    puts "\n Машину #{mark} #{model} [#{number}] успішно занесено в базу СТО"
+    if Database.add_car(number, mark, model, kilometers, oil, out_filter, in_filter, brakes, cooling)
+      puts "Машину #{mark} #{model} успішно додано до SQL бази!"
+    end
 
   when "2"
-
-    print "Введіть номер машини (ВС1715СВ)"
+    print 'Введіть номер машини:'
     number = gets.strip
 
-    row = Database.find_cars_users(number)
+    car_data = Database.find_car(number)
+    puts "Машину з номером #{number}"
+    if car_data
+      print 'Введіть поточний пробіг машини на сьогодні (км): '
+      current_kilometers = gets.to_i
 
-    if row
-
-    
-      oil_last_changes = row [4].to_i
-      last_outside_filter_changes = row [5].to_i
-      last_inside_filter_changes = row [6].to_i
-      last_brake_changes = row [7].to_i
-      cooling_last_changes = row [8].to_i
-
-      puts "\n Машину знайдено: #{row[1].upcase} #{row[2].upcase} [#{row[0]}]"
-      puts " ІСТОРІЯ ОСТАННІХ ЗАМІН НА СТО:"
-      puts " Мастило мінялося на пробігу: #{ oil_last_changes} км"
-      puts " Повітряний фільтр мінявся на: #{last_outside_filter_changes} км"
-      puts " Салонний фільтр мінявся на: #{last_inside_filter_changes} км"
-      puts " Гальмівні колодки мінялися на: #{last_brake_changes} км"
-      puts " Антифриз мінявся на пробігу: #{cooling_last_changes} км"
-  
-      print "Введіть поточний пробіг машини на сьогодні (км): "
-      kilometers = gets.to_i
-
-
-
+      Database.update_kilometers(number, current_kilometers)
 
       cars_sto = Car.new(
-        row[0], row[1], row[2], kilometers, 
-        oil_last_changes, last_outside_filter_changes, last_inside_filter_changes, last_brake_changes, cooling_last_changes
+        car_data['number'], 
+        car_data['mark'], 
+        car_data['model'], 
+        current_kilometers,
+        car_data['oil_last_changes'], 
+        car_data['last_outside_filter_changes'], 
+        car_data['last_inside_filter_changes'], 
+        car_data['last_brake_changes'], 
+        car_data['cooling_last_changes']
       )
 
-      puts "\n АКТУАЛЬНИЙ СТАН ЗАПЧАСТИН ПРИ ПРОБІГУ #{cars_sto.kilometers} км:"
-      puts " Мастило двигуна залишилось: #{cars_sto.calculate_oil_left} км"
-      puts " Фільтр повітря залишилось: #{cars_sto.calculate_outside_filter_left} км"
-      puts " Фільтр салону залишилось: #{cars_sto.calculate_inside_filter_left} км"
-      puts " Гальмівні колодки залишилось:#{cars_sto.calculate_brake_left} км"
-      puts " Антифриз залишилось: #{cars_sto.calculate_cooling_liqvid_left} км"
-
+      puts "\nАКТУАЛЬНИЙ СТАН ЗАПЧАСТИН ДЛЯ #{car_data['mark']} #{car_data['model']} (Пробіг: #{current_kilometers} км):"
+      puts "Мастило двигуна залишилось: #{cars_sto.calculate_oil_left} км"
+      puts "Фільтр повітря залишилось: #{cars_sto.calculate_outside_filter_left} км"
+      puts "Фільтр салону залишилось: #{cars_sto.calculate_inside_filter_left} км"
+      puts "Гальмівні колодки залишилось: #{cars_sto.calculate_brake_left} км"
+      puts "Антифриз залишилось: #{cars_sto.calculate_cooling_liqvid_left} км"
+    else
+      puts "Машину з номером #{number} не знайдено."
     end
 
   when "3"
-    puts "1 Масло "
-    puts "2 Повітряний фільтр салону"
-    puts "4 Повітряний фільтр двигуна"
-    puts "5 Гальмівні колодки"
-    puts "6 Охолоджуюча рідина"
-    print "7 Виберіть по якій запчатині ви б хотіли обновити дані(км)"
+    print 'Введіть номер машини для оновлення: '
+    number = gets.strip
+    
+    unless Database.find_car(number)
+      puts 'Такої машини немає в базі'
+      next
+    end
+
+    puts '\nЩо саме ви замінили?'
+    puts '1 - Мастило двигуна'
+    puts '2 - Повітряний фільтр'
+    puts '3 - Гальмівні колодки'
+    print 'Вибір: '
+    part_choice = gets.strip
+    
+    print 'Введіть пробіг, на якому відбулася заміна (км): '
+    new_km = gets.to_i
+
+    case part_choice
+    
+    when "1"
+      Database.update_part(number, 'oil_last_changes', new_km)
+      puts  'Запис про заміну мастила оновлено'
+    when "2"
+      Database.update_part(number, 'last_outside_filter_changes', new_km)
+      puts 'Запис про заміну повітряного фільтра оновлено'
+    when "3"
+      Database.update_part(number, 'last_brake_changes', new_km)
+      puts 'Запис про заміну гальм оновлено'
+    else
+      puts 'Невідома запчастина'
+    end
 
   when "4"
-
+    puts 'До побачення'
     break
-  
-
-
+  else
+    puts 'Невідома команда'
   end
 end
